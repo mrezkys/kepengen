@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:kepengen/model/core/wishlist.dart';
+import 'package:kepengen/model/helper/value_checker.dart';
 import 'package:kepengen/provider/local_database.dart';
-import 'package:kepengen/view/screen/wishlist_item_detail_page.dart';
 import 'package:kepengen/view/utils/gradient_background.dart';
 import 'package:kepengen/view/widget/main_app_bar.dart';
 
@@ -21,16 +22,14 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
   PageController _topContainerPageController = PageController(initialPage: 0);
 
   Future shortInfoData;
-  Future featuredItemData;
-  Future fiveRandomWishlist;
+  Future dashboardData;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     shortInfoData = getShortInfoData();
-    featuredItemData = getFeaturedItemData();
-    fiveRandomWishlist = getFiveRandomWishlist();
+    dashboardData = getDashboardData();
   }
 
   getShortInfoData() async {
@@ -60,13 +59,20 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
     return _fiveWishlist;
   }
 
+  getDashboardData() async {
+    return {
+      'featured_items': await getFeaturedItemData(),
+      'five_wishlist': await getFiveRandomWishlist(),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: ListView(
         children: <Widget>[
-          // Top Container
+          // Top Container & Short Info
           Container(
             height: 200,
             width: MediaQuery.of(context).size.width,
@@ -133,132 +139,114 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
             ),
           ),
           SizedBox(height: 10),
-          // Featured Wishlist Tab Bar
-          Container(
-            height: 60,
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              labelColor: Color(0xFF1C2635),
-              unselectedLabelColor: Color(0xFF9EA4AD),
-              labelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              unselectedLabelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              physics: BouncingScrollPhysics(),
-              indicatorColor: Colors.white,
-              tabs: [
-                Tab(
-                  child: Container(
-                    margin: EdgeInsets.only(left: 20),
-                    child: Text(
-                      'Terdekat',
-                    ),
-                  ),
-                ),
-                Tab(
-                  child: Container(
-                    child: Text(
-                      'Terpengen',
-                    ),
-                  ),
-                ),
-                Tab(
-                  child: Container(
-                    child: Text(
-                      'Termurah',
-                    ),
-                  ),
-                ),
-                Tab(
-                  child: Container(
-                    child: Text(
-                      'Termahal',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          //  Featured Tab Bar View
-          Container(
-            height: MediaQuery.of(context).size.width - 30 - 30,
-            child: FutureBuilder(
-              future: featuredItemData,
-              builder: (_, data) {
-                if (data.connectionState == ConnectionState.done) {
-                  print('featured tab data : ' + data.data.toString());
-                  return TabBarView(
-                    controller: _tabController,
-                    children: [
-                      FeaturedWishlistItem(),
-                      FeaturedWishlistItem(),
-                      FeaturedWishlistItem(),
-                      FeaturedWishlistItem(),
-                    ],
+          FutureBuilder(
+            future: dashboardData,
+            builder: (context, data) {
+              print(data.connectionState);
+              if (data.connectionState == ConnectionState.done) {
+                var featuredItem = data.data['featured_items'];
+                var fiveWishlist = data.data['five_wishlist'];
+                if (ValueChecker.isNullOrEmpty(featuredItem['terdekat']) && fiveWishlist.isEmpty) {
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width - 60,
+                    color: Colors.white,
+                    child: SvgPicture.asset('assets/images/no-data.svg'),
                   );
                 } else {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    child: SkeletonContainer.square(
-                      height: MediaQuery.of(context).size.width - 30 - 30, // because there is padding 30 px x 2
-                      width: MediaQuery.of(context).size.width,
-                      borderRadius: 10,
-                    ),
+                  return ListView(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: <Widget>[
+                      // Featured Wishlist Tab Bar
+                      Container(
+                        height: 60,
+                        child: TabBar(
+                          controller: _tabController,
+                          isScrollable: true,
+                          labelColor: Color(0xFF1C2635),
+                          unselectedLabelColor: Color(0xFF9EA4AD),
+                          labelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                          unselectedLabelStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                          physics: BouncingScrollPhysics(),
+                          indicatorColor: Colors.white,
+                          tabs: [
+                            Tab(
+                              child: Container(
+                                margin: EdgeInsets.only(left: 20),
+                                child: Text(
+                                  'Terdekat',
+                                ),
+                              ),
+                            ),
+                            Tab(
+                              child: Container(
+                                child: Text(
+                                  'Terpengen',
+                                ),
+                              ),
+                            ),
+                            Tab(
+                              child: Container(
+                                child: Text(
+                                  'Termurah',
+                                ),
+                              ),
+                            ),
+                            Tab(
+                              child: Container(
+                                child: Text(
+                                  'Termahal',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //  Featured Tab Bar View
+                      Container(
+                        height: MediaQuery.of(context).size.width - 30 - 30,
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            FeaturedWishlistItem(),
+                            FeaturedWishlistItem(),
+                            FeaturedWishlistItem(),
+                            FeaturedWishlistItem(),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 25),
+                      // Additional Text
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 30),
+                        child: Text('ini wishlist mu yang lain...', style: TextStyle(fontSize: 14, color: Color(0xFF606772))),
+                      ),
+                      SizedBox(height: 20),
+                      // 5 Wishlist Card
+                      ListView.separated(
+                        padding: EdgeInsets.only(bottom: 100),
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: fiveWishlist.length,
+                        separatorBuilder: (context, index) {
+                          return SizedBox(
+                            height: 10,
+                          );
+                        },
+                        itemBuilder: (context, index) {
+                          return WishlistItemTile(
+                            index: index,
+                            data: fiveWishlist[index],
+                          );
+                        },
+                      ),
+                    ],
                   );
                 }
-              },
-            ),
-          ),
-          SizedBox(height: 25),
-          // Additional Text
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 30),
-            child: Text('ini wishlist mu yang lain...', style: TextStyle(fontSize: 14, color: Color(0xFF606772))),
-          ),
-          SizedBox(height: 20),
-          // 5 Wishlist Card
-          FutureBuilder(
-            future: fiveRandomWishlist,
-            builder: (_, item) {
-              if (item.connectionState == ConnectionState.done) {
-                return ListView.separated(
-                  padding: EdgeInsets.only(bottom: 100),
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: item.data.length,
-                  separatorBuilder: (context, index) {
-                    return SizedBox(
-                      height: 10,
-                    );
-                  },
-                  itemBuilder: (context, index) {
-                    return WishlistItemTile(
-                      index: index,
-                      data: item.data[index],
-                    );
-                  },
-                );
               } else {
-                return ListView.separated(
-                  padding: EdgeInsets.only(bottom: 100),
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: 3,
-                  separatorBuilder: (context, index) {
-                    return SizedBox(
-                      height: 10,
-                    );
-                  },
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30),
-                      child: SkeletonContainer.square(
-                        height: 80,
-                        width: MediaQuery.of(context).size.width,
-                        borderRadius: 10,
-                      ),
-                    );
-                  },
-                );
+                return Text('waiting');
               }
             },
           ),
