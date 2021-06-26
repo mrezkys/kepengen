@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kepengen/model/helper/value_checker.dart';
 import 'package:kepengen/provider/local_database.dart';
-import 'package:kepengen/provider/wishlist_provider.dart';
 import 'package:kepengen/view/modal/wishlist_page_filter_modal.dart';
 import 'package:kepengen/view/screen/wishlist_item_detail_page.dart';
 import 'package:kepengen/view/utils/gradient_background.dart';
 import 'package:kepengen/view/widget/main_app_bar.dart';
 import 'package:kepengen/view/widget/skeleton_container.dart';
 import 'package:kepengen/view/widget/wishlist_item_tile.dart';
-import 'package:provider/provider.dart';
 
 class WishlistPage extends StatefulWidget {
   @override
@@ -137,79 +136,74 @@ class _WishlistPageState extends State<WishlistPage> {
               ],
             ),
           ),
-          Consumer<WishlistProvider>(
-            builder: (context, _wishlistProvider, _) {
-              if (_wishlistProvider.isCompleted == true) {
-                listWishlist = getListWishlist(filter: 'completed');
-              } else if (_wishlistProvider.isInCompleted == true) {
-                listWishlist = getListWishlist(filter: 'incompleted');
-              } else if (_wishlistProvider.filterTerdekat == true) {
-                listWishlist = getListWishlist(filter: 'terdekat');
-              } else if (_wishlistProvider.filterTerpengen == true) {
-                listWishlist = getListWishlist(filter: 'terpengen');
-              } else if (_wishlistProvider.filterTermurah == true) {
-                listWishlist = getListWishlist(filter: 'termurah');
-              } else if (_wishlistProvider.filterTermahal == true) {
-                listWishlist = getListWishlist(filter: 'termahal');
-              }
-              return Container(
-                margin: EdgeInsets.only(top: 30, bottom: 120),
-                child: FutureBuilder(
-                  future: listWishlist,
-                  builder: (_, data) {
-                    if (data.connectionState == ConnectionState.done) {
-                      return ListView.separated(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: data.data.length,
-                        separatorBuilder: (context, index) {
-                          return SizedBox(height: 15);
-                        },
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            child: WishlistItemTile(
-                              index: index,
-                              data: data.data[index],
-                            ),
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => WishlistItemDetailPage(
-                                    index: index,
-                                  ),
+          Container(
+            margin: EdgeInsets.only(top: 30, bottom: 120),
+            child: FutureBuilder(
+              future: listWishlist,
+              builder: (_, data) {
+                print(data.data);
+                // TODO: fix error because of no error handler if return data is empty
+                if (data.connectionState == ConnectionState.done) {
+                  if (!ValueChecker.isNullOrEmpty(data.data)) {
+                    return ListView.separated(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: data.data.length,
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: 15);
+                      },
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          child: WishlistItemTile(
+                            index: index,
+                            data: data.data[index],
+                          ),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => WishlistItemDetailPage(
+                                  index: index,
                                 ),
-                              );
-                            },
-                          );
-                        },
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  } else {
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.width - 60,
+                      color: Colors.white,
+                      child: SvgPicture.asset('assets/images/no-data.svg'),
+                    );
+                  }
+                } else {
+                  return ListView.separated(
+                    padding: EdgeInsets.only(bottom: 100),
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: 3,
+                    separatorBuilder: (context, index) {
+                      return SizedBox(
+                        height: 10,
                       );
-                    } else {
-                      return ListView.separated(
-                        padding: EdgeInsets.only(bottom: 100),
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: 3,
-                        separatorBuilder: (context, index) {
-                          return SizedBox(
-                            height: 10,
-                          );
-                        },
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 30),
-                            child: SkeletonContainer.square(
-                              height: 80,
-                              width: MediaQuery.of(context).size.width,
-                              borderRadius: 10,
-                            ),
-                          );
-                        },
+                    },
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                        child: SkeletonContainer.square(
+                          height: 80,
+                          width: MediaQuery.of(context).size.width,
+                          borderRadius: 10,
+                        ),
                       );
-                    }
-                  },
-                ),
-              );
-            },
+                    },
+                  );
+                }
+              },
+            ),
           ),
         ],
       ),
