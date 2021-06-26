@@ -114,10 +114,10 @@ class DBProvider {
     // TODO: make error handler
     final db = await database;
     var res = await db.rawQuery("SELECT * FROM wishlist ORDER BY RANDOM() Limit 5");
-    if (res.length == 0) {
-      return null;
-    } else {
+    if (res.length != 0) {
       return res.map((e) => Wishlist.fromJson(e)).toList();
+    } else {
+      return [];
     }
   }
 
