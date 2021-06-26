@@ -146,15 +146,9 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
               if (data.connectionState == ConnectionState.done) {
                 var featuredItem = data.data['featured_items'];
                 var fiveWishlist = data.data['five_wishlist'];
-                if (ValueChecker.isNullOrEmpty(featuredItem['terdekat']) && fiveWishlist.isEmpty) {
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.width - 60,
-                    color: Colors.white,
-                    child: SvgPicture.asset('assets/images/no-data.svg'),
-                  );
-                } else {
+                print(featuredItem);
+                print(fiveWishlist);
+                if (!ValueChecker.isNullOrEmpty(featuredItem['terdekat']) && fiveWishlist.isNotEmpty) {
                   return ListView(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -244,9 +238,37 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                       ),
                     ],
                   );
+                } else {
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.width - 60,
+                    color: Colors.white,
+                    child: SvgPicture.asset('assets/images/no-data.svg'),
+                  );
                 }
               } else {
-                return Text('waiting');
+                return ListView.separated(
+                  padding: EdgeInsets.only(bottom: 100),
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: 3,
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: 10,
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      child: SkeletonContainer.square(
+                        height: 80,
+                        width: MediaQuery.of(context).size.width,
+                        borderRadius: 10,
+                      ),
+                    );
+                  },
+                );
               }
             },
           ),
