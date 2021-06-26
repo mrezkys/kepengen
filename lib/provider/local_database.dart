@@ -46,9 +46,8 @@ class DBProvider {
     return true;
   }
 
-  Future<List<Wishlist>> getAllWishlist({String filter}) async {
+  Future<List<Wishlist>> getAllWishlist({String filter = 'all'}) async {
     if (filter == 'completed') {
-      // TODO: make error handler
       final db = await database;
       var res = await db.rawQuery("SELECT * FROM wishlist WHERE STATUS=1");
       try {
@@ -57,7 +56,6 @@ class DBProvider {
         return e;
       }
     } else if (filter == 'incompleted') {
-      // TODO: make error handler
       final db = await database;
       var res = await db.rawQuery("SELECT * FROM wishlist WHERE STATUS IS NOT 1");
       try {
@@ -66,7 +64,6 @@ class DBProvider {
         return e;
       }
     } else if (filter == 'terdekat') {
-      // TODO: make error handler
       final db = await database;
       var res = await db.rawQuery("SELECT * FROM WISHLIST ORDER BY deadline");
       try {
@@ -98,14 +95,14 @@ class DBProvider {
       } catch (e) {
         print(e);
       }
-    } else {
-      // TODO: make error handler
+    } else if (filter == 'all') {
       final db = await database;
-      var res = await db.rawQuery("SELECT * FROM wishlist");
+      var res = await db.query("wishlist");
       try {
         return res.map((e) => Wishlist.fromJson(e)).toList();
       } catch (e) {
-        return e;
+        print(e);
+        return [];
       }
     }
   }
