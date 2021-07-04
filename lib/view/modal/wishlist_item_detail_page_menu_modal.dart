@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kepengen/provider/local_database.dart';
 import 'package:kepengen/view/widget/menu_modal_item.dart';
 
 class WishlistItemDetailPageMenuModal extends StatelessWidget {
-  final int wishlistItemIndex;
-  WishlistItemDetailPageMenuModal({this.wishlistItemIndex});
+  final int wishlistId;
+  WishlistItemDetailPageMenuModal({@required this.wishlistId});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,7 +23,6 @@ class WishlistItemDetailPageMenuModal extends StatelessWidget {
         ),
         child: Column(
           children: <Widget>[
-            //header
             // TODO: make header to widget
             Container(
               height: 56,
@@ -88,8 +88,8 @@ class WishlistItemDetailPageMenuModal extends StatelessWidget {
                   MenuModalItem(
                     text: 'Delete',
                     icon: SvgPicture.asset('assets/icons/Delete.svg'),
-                    onTap: () {
-                      print('aaaa');
+                    onTap: () async {
+                      await DBProvider.db.deleteWishlist(wishlistId);
                       Navigator.pop(context); //close the menu
                       Navigator.pop(context); //close the wishlist item detail page
                     },
@@ -99,7 +99,13 @@ class WishlistItemDetailPageMenuModal extends StatelessWidget {
                     height: 3,
                   ),
                   // Screenshot -------------
-                  MenuModalItem(text: 'Screenshot', icon: SvgPicture.asset('assets/icons/Camera.svg')),
+                  MenuModalItem(
+                    text: 'Screenshot',
+                    icon: SvgPicture.asset('assets/icons/Camera.svg'),
+                    onTap: () {
+                      Navigator.of(context).pop('screenshot');
+                    },
+                  ),
                   Divider(
                     color: Colors.grey,
                     height: 3,

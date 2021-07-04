@@ -1,9 +1,11 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:kepengen/model/core/wishlist.dart';
+import 'package:kepengen/model/helper/dummy_helper.dart';
 import 'package:kepengen/model/helper/value_checker.dart';
 import 'package:kepengen/provider/local_database.dart';
 import 'package:kepengen/provider/wishlist_provider.dart';
@@ -51,7 +53,8 @@ class _AddWishlistPageState extends State<AddWishlistPage> {
                   price: provider.wishlistPrice,
                   deadline: provider.wishlistDeadlineDate + ' ' + provider.wishlistDeadlineTime,
                   notification: provider.wishlistNotification,
-                  photo: '',
+                  photo: await provider.saveWishlistPhoto(provider.wishlistPickedPhoto) ?? await DummyHelper.getImageDummy(),
+                  status: 0,
                   priority: provider.wishlistPriority,
                 )));
                 provider.formReset();
@@ -116,11 +119,13 @@ class _AddWishlistPageState extends State<AddWishlistPage> {
                     inputTitle: 'Harga Wishlist *',
                     hint: '5.200.000',
                     onChanged: (value) {
+                      var newVal = value.replaceAll(',', ''); // because the ouput of the input is xxx,xxx,xxx but i need the xxxxxxxxx format to parse string
                       try {
-                        provider.wishlistPrice = int.parse(value);
+                        provider.wishlistPrice = int.parse(newVal);
                         print(provider.wishlistPrice);
                       } catch (e) {
                         print('the input value is not a number');
+                        print(e);
                       }
                     },
                   ),
@@ -523,7 +528,10 @@ class PriceInput extends StatelessWidget {
                     onChanged: onChanged,
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly,
+                      CurrencyTextInputFormatter(
+                        symbol: '',
+                        decimalDigits: 0,
+                      )
                     ],
                     decoration: InputDecoration(
                       border: InputBorder.none,

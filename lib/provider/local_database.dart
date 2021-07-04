@@ -46,6 +46,11 @@ class DBProvider {
     return true;
   }
 
+  deleteWishlist(int id) async {
+    final db = await database;
+    await db.rawDelete("DELETE FROM  wishlist WHERE ID=" + id.toString());
+  }
+
   Future<List<Wishlist>> getAllWishlist({String filter = 'all'}) async {
     if (filter == 'completed') {
       final db = await database;
@@ -63,39 +68,133 @@ class DBProvider {
       } catch (e) {
         return e;
       }
-    } else if (filter == 'terdekat') {
+    }
+
+    //  Terdekat ---------------------------------------------------------------------------
+    else if (filter == 'terdekat') {
       final db = await database;
       var res = await db.rawQuery("SELECT * FROM WISHLIST ORDER BY deadline");
       try {
+        print('terdekat');
         return res.map((e) => Wishlist.fromJson(e)).toList();
       } catch (e) {
         return e;
       }
-    } else if (filter == 'terpengen') {
+    } else if (filter == 'terdekat & Completed') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=1 ORDER BY deadline");
+      try {
+        print('terdekat & Completed');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    } else if (filter == 'terdekat & inCompleted') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=0 ORDER BY deadline");
+      try {
+        print('terdekat & inCompleted');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    }
+    //  ----------------------------------------------------------------------------------
+
+    //  Terpengen ---------------------------------------------------------------------------
+    else if (filter == 'terpengen') {
       final db = await database;
       var res = await db.rawQuery("SELECT * FROM WISHLIST ORDER BY priority DESC");
       try {
+        print('terpengen');
         return res.map((e) => Wishlist.fromJson(e)).toList();
       } catch (e) {
-        print(3);
+        print(e);
       }
-    } else if (filter == 'termurah') {
+    } else if (filter == 'terpengen & Completed') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=1 ORDER BY priority DESC");
+      try {
+        print('terpengen & Completed');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    } else if (filter == 'terpengen & inCompleted') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=0 ORDER BY priority DESC");
+      try {
+        print('terpengen & inCompleted');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    }
+    //  ----------------------------------------------------------------------------------
+
+    //  Termurah ---------------------------------------------------------------------------
+    else if (filter == 'termurah') {
       final db = await database;
       var res = await db.rawQuery("SELECT * FROM WISHLIST ORDER BY price");
       try {
+        print('termurah');
         return res.map((e) => Wishlist.fromJson(e)).toList();
       } catch (e) {
         print(e);
       }
-    } else if (filter == 'termahal') {
+    } else if (filter == 'termurah & Completed') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=1 ORDER BY price");
+      try {
+        print('termurah & Completed');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    } else if (filter == 'termurah & inCompleted') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=0 ORDER BY price");
+      try {
+        print('termurah & inCompleted');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    }
+    //  ----------------------------------------------------------------------------------
+
+    //  Termahal ---------------------------------------------------------------------------
+    else if (filter == 'termahal') {
       final db = await database;
       var res = await db.rawQuery("SELECT * FROM WISHLIST ORDER BY price DESC");
       try {
+        print('termahal');
         return res.map((e) => Wishlist.fromJson(e)).toList();
       } catch (e) {
         print(e);
       }
-    } else if (filter == 'all') {
+    } else if (filter == 'termahal & Completed') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=1 ORDER BY price DESC");
+      try {
+        print('termahal & Completed');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    } else if (filter == 'termahal & inCompleted') {
+      final db = await database;
+      var res = await db.rawQuery("SELECT * FROM WISHLIST WHERE STATUS=0 ORDER BY price DESC");
+      try {
+        print('termahal & inCompleted');
+        return res.map((e) => Wishlist.fromJson(e)).toList();
+      } catch (e) {
+        print(e);
+      }
+    }
+    //  ----------------------------------------------------------------------------------
+
+    else if (filter == 'all') {
       final db = await database;
       var res = await db.query("wishlist");
       try {
@@ -179,5 +278,15 @@ class DBProvider {
       return total;
     }
     return 0;
+  }
+
+  Future<dynamic> setCompletedWishlist(int id) async {
+    final db = await database;
+    var res = await db.rawQuery("UPDATE WISHLIST SET status=1 WHERE id=" + id.toString());
+    if (res.isEmpty) {
+      return 'Success!';
+    } else {
+      return 'Error';
+    }
   }
 }

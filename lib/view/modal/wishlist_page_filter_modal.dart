@@ -96,6 +96,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                           ),
                           Checkbox(
                             onChanged: (value) {
+                              _wishlistProvider.resetFilter();
                               _wishlistProvider.isCompleted = value;
                             },
                             checkColor: Theme.of(context).primaryColor,
@@ -122,6 +123,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                           ),
                           Checkbox(
                             onChanged: (value) {
+                              _wishlistProvider.resetFilter();
                               _wishlistProvider.isInCompleted = value;
                             },
                             checkColor: Theme.of(context).primaryColor,
@@ -152,6 +154,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                     GestureDetector(
                       onTap: () {
                         if (_wishlistProvider.filterTerdekat == false) {
+                          _wishlistProvider.resetSortFilter();
                           _wishlistProvider.filterTerdekat = true;
                         } else {
                           _wishlistProvider.filterTerdekat = false;
@@ -160,7 +163,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                         Navigator.of(context).pop();
                       },
                       child: Container(
-                        color: Colors.green,
+                        color: Colors.white,
                         width: MediaQuery.of(context).size.width - 20 - 20,
                         height: 45,
                         alignment: Alignment.centerLeft,
@@ -178,6 +181,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                     GestureDetector(
                       onTap: () {
                         if (_wishlistProvider.filterTerpengen == false) {
+                          _wishlistProvider.resetSortFilter();
                           _wishlistProvider.filterTerpengen = true;
                         } else {
                           _wishlistProvider.filterTerpengen = false;
@@ -186,7 +190,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                         Navigator.of(context).pop();
                       },
                       child: Container(
-                        color: Colors.green,
+                        color: Colors.white,
                         width: MediaQuery.of(context).size.width - 20 - 20,
                         height: 45,
                         alignment: Alignment.centerLeft,
@@ -204,6 +208,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                     GestureDetector(
                       onTap: () {
                         if (_wishlistProvider.filterTermurah == false) {
+                          _wishlistProvider.resetSortFilter();
                           _wishlistProvider.filterTermurah = true;
                         } else {
                           _wishlistProvider.filterTermurah = false;
@@ -212,7 +217,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                         Navigator.of(context).pop();
                       },
                       child: Container(
-                        color: Colors.green,
+                        color: Colors.white,
                         width: MediaQuery.of(context).size.width - 20 - 20,
                         height: 45,
                         alignment: Alignment.centerLeft,
@@ -230,6 +235,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                     GestureDetector(
                       onTap: () {
                         if (_wishlistProvider.filterTermahal == false) {
+                          _wishlistProvider.resetSortFilter();
                           _wishlistProvider.filterTermahal = true;
                         } else {
                           _wishlistProvider.filterTermahal = false;
@@ -238,7 +244,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                         Navigator.of(context).pop();
                       },
                       child: Container(
-                        color: Colors.green,
+                        color: Colors.white,
                         width: MediaQuery.of(context).size.width - 20 - 20,
                         height: 45,
                         alignment: Alignment.centerLeft,

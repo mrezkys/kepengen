@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kepengen/model/helper/value_checker.dart';
 import 'package:kepengen/provider/local_database.dart';
 import 'package:kepengen/provider/wishlist_provider.dart';
 import 'package:kepengen/view/modal/wishlist_page_filter_modal.dart';
@@ -17,7 +16,6 @@ class WishlistPage extends StatefulWidget {
 }
 
 class _WishlistPageState extends State<WishlistPage> {
-  TextEditingController _searchController = TextEditingController();
   Future listWishlist;
 
   @override
@@ -39,7 +37,7 @@ class _WishlistPageState extends State<WishlistPage> {
         children: <Widget>[
           // Top Container
           Container(
-            height: 200,
+            height: 180,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(gradient: GradientBackground.gradient()),
             child: Column(
@@ -94,25 +92,87 @@ class _WishlistPageState extends State<WishlistPage> {
             margin: EdgeInsets.only(top: 30, bottom: 120),
             child: Consumer<WishlistProvider>(
               builder: (context, _wishlistProvider, _) {
-                if (_wishlistProvider.isCompleted == true) {
-                  listWishlist = getListWishlist(filter: 'completed');
-                } else if (_wishlistProvider.isInCompleted == true) {
-                  listWishlist = getListWishlist(filter: 'incompleted');
-                } else if (_wishlistProvider.filterTerdekat == true) {
-                  listWishlist = getListWishlist(filter: 'terdekat');
-                } else if (_wishlistProvider.filterTerpengen == true) {
-                  listWishlist = getListWishlist(filter: 'terpengen');
-                } else if (_wishlistProvider.filterTermurah == true) {
-                  listWishlist = getListWishlist(filter: 'termurah');
-                } else if (_wishlistProvider.filterTermahal == true) {
-                  listWishlist = getListWishlist(filter: 'termahal');
-                } else {
+                checkTrueFilter() {
+                  if (_wishlistProvider.filterTerdekat == true || _wishlistProvider.filterTerdekat == true || _wishlistProvider.filterTerdekat == true || _wishlistProvider.filterTerdekat == true) {
+                    return true;
+                  } else {
+                    return false;
+                  }
+                }
+
+                checkTrueSort() {
+                  if (_wishlistProvider.isCompleted == true || _wishlistProvider.isInCompleted == true) {
+                    return true;
+                  } else {
+                    return false;
+                  }
+                }
+
+                if (checkTrueSort() == false && checkTrueFilter() == false) {
                   listWishlist = getListWishlist(filter: 'all');
                 }
+
+                if (_wishlistProvider.isCompleted == true && checkTrueFilter() == false) {
+                  listWishlist = getListWishlist(filter: 'completed');
+                } else if (_wishlistProvider.isInCompleted == true && checkTrueFilter() == false) {
+                  listWishlist = getListWishlist(filter: 'incompleted');
+                }
+
+                //  terdekat ---------------------------------------------------------------
+                // terdekat without filter
+                if (_wishlistProvider.filterTerdekat == true && checkTrueSort() == false) {
+                  listWishlist = getListWishlist(filter: 'terdekat'); // -------------------
+                }
+                // with completed filter
+                else if (_wishlistProvider.filterTerdekat == true && _wishlistProvider.isCompleted == true) {
+                  print('eee');
+                  listWishlist = getListWishlist(filter: 'terdekat & Completed'); // -------------------
+                }
+                // with incompleted filter
+                else if (_wishlistProvider.filterTerdekat == true && _wishlistProvider.isInCompleted == true) {
+                  listWishlist = getListWishlist(filter: 'terdekat & inCompleted'); // -------------------
+                }
+                //  ------------------------------------------------------------------------
+
+                //  terpengen ---------------------------------------------------------------
+                if (_wishlistProvider.filterTerpengen == true && checkTrueSort() == false) {
+                  print('exccc');
+                  listWishlist = getListWishlist(filter: 'terpengen');
+                }
+                // with completed filter
+                else if (_wishlistProvider.filterTerpengen == true && _wishlistProvider.isCompleted == true) {
+                  print('exc');
+                  listWishlist = getListWishlist(filter: 'terpengen & Completed');
+                }
+                // with incompleted filter
+                else if (_wishlistProvider.filterTerpengen == true && _wishlistProvider.isInCompleted == true) {
+                  listWishlist = getListWishlist(filter: 'terpengen & inCompleted');
+                }
+                //  ------------------------------------------------------------------------
+
+                //  termurah ---------------------------------------------------------------
+                if (_wishlistProvider.filterTermurah == true && checkTrueSort() == false) {
+                  listWishlist = getListWishlist(filter: 'termurah');
+                } else if (_wishlistProvider.filterTermurah == true && _wishlistProvider.isCompleted == true) {
+                  listWishlist = getListWishlist(filter: 'termurah & Completed');
+                } else if (_wishlistProvider.filterTermurah == true && _wishlistProvider.isInCompleted == true) {
+                  listWishlist = getListWishlist(filter: 'termurah & inCompleted');
+                }
+                //  ------------------------------------------------------------------------
+
+                //  termahal ---------------------------------------------------------------
+                if (_wishlistProvider.filterTermahal == true && checkTrueSort() == false) {
+                  listWishlist = getListWishlist(filter: 'termahal');
+                } else if (_wishlistProvider.filterTermahal == true && _wishlistProvider.isCompleted == true) {
+                  listWishlist = getListWishlist(filter: 'termahal & Completed');
+                } else if (_wishlistProvider.filterTermahal == true && _wishlistProvider.isInCompleted == true) {
+                  listWishlist = getListWishlist(filter: 'termahal & inCompleted');
+                }
+                //  ------------------------------------------------------------------------
+
                 return FutureBuilder(
                   future: listWishlist,
                   builder: (_, data) {
-                    print(data.data);
                     if (data.connectionState == ConnectionState.done) {
                       if (data.data.isNotEmpty) {
                         return ListView.separated(
@@ -123,20 +183,8 @@ class _WishlistPageState extends State<WishlistPage> {
                             return SizedBox(height: 15);
                           },
                           itemBuilder: (context, index) {
-                            return GestureDetector(
-                              child: WishlistItemTile(
-                                index: index,
-                                data: data.data[index],
-                              ),
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => WishlistItemDetailPage(
-                                      index: index,
-                                    ),
-                                  ),
-                                );
-                              },
+                            return WishlistItemTile(
+                              itemData: data.data[index],
                             );
                           },
                         );

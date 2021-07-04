@@ -1,21 +1,110 @@
 import 'dart:io';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:kepengen/model/core/wishlist.dart';
+import 'package:kepengen/model/helper/rupiah_formatter.dart';
 import 'package:kepengen/model/helper/value_checker.dart';
+import 'package:kepengen/provider/local_database.dart';
 import 'package:kepengen/view/modal/wishlist_item_detail_page_menu_modal.dart';
 import 'package:kepengen/view/utils/gradient_background.dart';
 import 'package:kepengen/view/widget/main_app_bar.dart';
+import 'package:kepengen/view/widget/screenshot%20widget/wishlist_item_detail_screenshot.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share/share.dart';
 
 class WishlistItemDetailPage extends StatelessWidget {
-  final int index;
-  WishlistItemDetailPage({this.index});
+  Wishlist itemData;
+  WishlistItemDetailPage({@required this.itemData});
+
   @override
   Widget build(BuildContext context) {
+    // TODO: buat kaya notifikasi kalau sudah completed
+    CountdownTimerController _countdownTimerController = CountdownTimerController(endTime: DateTime.parse(itemData.deadline).millisecondsSinceEpoch);
+
+    ScreenshotController screenshotController = ScreenshotController();
+
+    Future<bool> _requestPermission(Permission permission) async {
+      if (await permission.isGranted) {
+        return true;
+      } else {
+        var result = await permission.request();
+        if (result == PermissionStatus.granted) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    Future<dynamic> saveScreenshot() async {
+      String fileName = "Wishlist ${DateTime.now().millisecondsSinceEpoch.toString()}";
+      Directory directory;
+      try {
+        // Checking the permission
+        if (await _requestPermission(Permission.manageExternalStorage)) {
+          try {
+            // Process to get the directory path /Pictures/Kepengen
+            directory = await getExternalStorageDirectory();
+            String newPath = "";
+            List<String> folders = directory.path.split("/");
+            for (int i = 1; i < folders.length; i++) {
+              String folder = folders[i];
+              if (folder != 'Android') {
+                newPath += "/" + folder;
+              } else {
+                break;
+              }
+            }
+            print(newPath);
+            newPath = newPath + '/Pictures/Kepengen';
+            directory = Directory(newPath);
+          } catch (e) {
+            print(e);
+          }
+        } else {
+          return 'Mohon izinkan Akses Penyimpanan';
+        }
+
+        // Checking the directory | is exist or not, if not then create
+        if (!await directory.exists()) {
+          print(await Permission.storage.isGranted); // print Granted status
+          await directory.create(recursive: true);
+        }
+
+        // if exist you can save the screenshot
+        if (await directory.exists()) {
+          var file = await screenshotController.captureFromWidget(wishlistItemDetailScreenshot(itemData: itemData, context: context, countdownTimerController: _countdownTimerController));
+          var result = await ImageGallerySaver.saveImage(
+            file,
+            quality: 100,
+            name: 'Kepengen' + "/$fileName",
+          );
+          print(result);
+        }
+      } catch (e) {
+        print(e);
+        return e;
+      }
+      return '${directory.path}/$fileName.jpg';
+    }
+
+    Future<void> shareImage(String path, Map imageData) {
+      Share.shareFiles(
+        [path],
+        text: 'Lihat nih wishlist saya ${imageData['name']}, seharga ${imageData['price']} di ${imageData['link']}. Kamu bisa simpan Wishlist dengan Aplikasi Kepengen, download di playstore : ',
+        subject: 'Lihat nih Wishlist saya,  ${imageData['name']}',
+      );
+    }
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(gradient: GradientBackground.gradient()),
@@ -35,16 +124,76 @@ class WishlistItemDetailPage extends StatelessWidget {
                   leftIconOnPressed: () {
                     Navigator.pop(context);
                   },
-                  rightIconOnPressed: () {
-                    showModalBottomSheet(
+                  rightIconOnPressed: () async {
+                    var returnValue = showModalBottomSheet(
                         elevation: 0.0,
                         isDismissible: true,
                         backgroundColor: Colors.transparent,
                         isScrollControlled: true,
                         context: context,
                         builder: (context) {
-                          return WishlistItemDetailPageMenuModal(wishlistItemIndex: index);
+                          return WishlistItemDetailPageMenuModal(
+                            wishlistId: itemData.id,
+                          );
                         });
+                    var value = await returnValue;
+                    if (value == 'screenshot') {
+                      var screenshot = await saveScreenshot();
+                      print(screenshot);
+                      return showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              insetPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                              content: Container(
+                                width: MediaQuery.of(context).size.width * 80 / 100,
+                                child: ListView(
+                                  shrinkWrap: true,
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.topCenter,
+                                      width: MediaQuery.of(context).size.width * 80 / 10,
+                                      height: 240,
+                                      color: Colors.black,
+                                      child: Image.file(
+                                        File(screenshot),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        print('share!');
+                                        shareImage(screenshot, {
+                                          'name': itemData.name,
+                                          'price': itemData.price,
+                                          'link': itemData.link,
+                                        });
+                                      },
+                                      child: Text('Bagikan Screenshot'),
+                                      style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(vertical: 15),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text('Lain Kali', style: TextStyle(color: Theme.of(context).primaryColor)),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.white,
+                                        padding: EdgeInsets.symmetric(vertical: 15),
+                                        elevation: 0.0,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+                    }
                   },
                 ),
                 SizedBox(height: 10),
@@ -65,7 +214,7 @@ class WishlistItemDetailPage extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Complete',
+                            (itemData.status == 0) ? 'InCompleted' : 'Completed',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.white,
@@ -83,18 +232,18 @@ class WishlistItemDetailPage extends StatelessWidget {
                             style: TextStyle(fontSize: 12, color: Colors.white),
                           ),
                           SizedBox(height: 8),
-                          // CountdownTimer(
-                          //   controller: _countDownController,
-                          //   textStyle: TextStyle(
-                          //     fontSize: 14,
-                          //     color: Colors.white,
-                          //     fontFamily: 'Poppins',
-                          //     fontWeight: FontWeight.w600,
-                          //   ),
-                          //   onEnd: () {
-                          //     _countDownController.dispose();
-                          //   },
-                          // ),
+                          CountdownTimer(
+                            controller: _countdownTimerController,
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                            ),
+                            onEnd: () {
+                              _countdownTimerController.dispose();
+                            },
+                          ),
                         ],
                       ),
                     ],
@@ -110,7 +259,7 @@ class WishlistItemDetailPage extends StatelessWidget {
                       Container(
                         height: 220,
                         decoration: BoxDecoration(
-                          // image: DecorationImage(fit: BoxFit.cover, image: FileImage(File(_photo))),
+                          image: DecorationImage(fit: BoxFit.cover, image: FileImage(File(itemData.photo))),
                           color: Color(0xFFDEEAF8),
                           borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
                         ),
@@ -132,9 +281,9 @@ class WishlistItemDetailPage extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text('_name', style: TextStyle(fontSize: 18, fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
+                                      Text(itemData.name, style: TextStyle(fontSize: 18, fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
                                       SizedBox(height: 5),
-                                      Text('Target : ' + '_date', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
+                                      Text('Target : ' + itemData.deadline.substring(0, 10), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
                                     ],
                                   ),
                                 ),
@@ -142,17 +291,26 @@ class WishlistItemDetailPage extends StatelessWidget {
                                   flex: 4,
                                   child: Center(
                                     child: IconButton(
+                                      // TODO: make notification if this clicked but the link is null
                                       icon: SvgPicture.asset('assets/icons/Send.svg'),
                                       onPressed: () async {
-                                        final Uri _lun = Uri(
-                                          scheme: 'http',
-                                          path: '_link',
-                                        );
-                                        if (!ValueChecker.isNullOrEmpty('_link')) {
-                                          launch(_lun.toString());
+                                        if (ValueChecker.isNullOrEmpty(itemData.link)) {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => AlertDialog(
+                                              content: Text(
+                                                'Wishlist ini tidak memiliki alamat untuk dituju. Silahkan tambahkan alamat pada menu edit.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(fontFamily: 'Poppins', fontSize: 14),
+                                              ),
+                                            ),
+                                          );
                                         } else {
-                                          print('there is no link to go');
-                                          //TODO: make alert for this, and option to add link
+                                          final Uri _lun = Uri(
+                                            scheme: 'http',
+                                            path: itemData.link,
+                                          );
+                                          launch(_lun.toString());
                                         }
                                       },
                                     ),
@@ -168,31 +326,41 @@ class WishlistItemDetailPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Perkiraan Harga', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF606772))),
-                                    SizedBox(height: 8),
-                                    Text('Rp ' + 127.toString(), style: TextStyle(fontSize: 18, fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
-                                  ],
+                                Flexible(
+                                  flex: 8,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Perkiraan Harga', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF606772))),
+                                      SizedBox(height: 8),
+                                      AutoSizeText(
+                                        RupiahFormatter.formatCurrency.format(itemData.price),
+                                        maxLines: 1,
+                                        style: TextStyle(fontSize: 18, fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Prioritas', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF606772))),
-                                    SizedBox(height: 8),
-                                    SmoothStarRating(
-                                      allowHalfRating: false,
-                                      color: Theme.of(context).primaryColor,
-                                      borderColor: Colors.grey,
-                                      starCount: 5,
-                                      rating: 4,
-                                      size: 16,
-                                      isReadOnly: true,
-                                    )
-                                  ],
+                                Flexible(
+                                  flex: 4,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Prioritas', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xFF606772))),
+                                      SizedBox(height: 8),
+                                      SmoothStarRating(
+                                        allowHalfRating: false,
+                                        color: Theme.of(context).primaryColor,
+                                        borderColor: Colors.grey,
+                                        starCount: 5,
+                                        rating: itemData.priority,
+                                        size: 16,
+                                        isReadOnly: true,
+                                      )
+                                    ],
+                                  ),
                                 )
                               ],
                             )
@@ -213,14 +381,17 @@ class WishlistItemDetailPage extends StatelessWidget {
                   width: MediaQuery.of(context).size.width - 30 - 30,
                   height: 65,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      print('clicked');
+                      DBProvider.db.setCompletedWishlist(itemData.id).then((value) => print(value));
+                    },
                     style: ElevatedButton.styleFrom(
-                      primary: Color(0xFF15DBAB),
+                      primary: (itemData.status == 0) ? Color(0xFF15DBAB) : Color(0xFFDCB30B),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       elevation: 0.0,
                     ),
                     child: Text(
-                      'Selesai',
+                      (itemData.status == 0) ? 'Selesaikan' : 'Telah Selesai',
                       style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
                     ),
                   ),

@@ -1,4 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:kepengen/model/helper/rupiah_formatter.dart';
 
 class DashboardShortInfo extends StatelessWidget {
   final String type;
@@ -12,7 +14,7 @@ class DashboardShortInfo extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text('Rp. ' + data.toString(), style: TextStyle(color: Colors.white, fontSize: 24, fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
+          AutoSizeText(RupiahFormatter.formatCurrency.format(data), style: TextStyle(color: Colors.white, fontSize: 24, fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
           SizedBox(
             height: 5,
           ),

@@ -7,10 +7,9 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart' as pathProvider;
 
 class WishlistProvider extends ChangeNotifier {
-  bool _resetFilter = false;
-  get resetFilter => _resetFilter;
-  set resetFilter(value) {
-    _resetFilter = value;
+  resetFilter() {
+    _isCompleted = false;
+    _isInCompleted = false;
     notifyListeners();
   }
 
@@ -18,9 +17,6 @@ class WishlistProvider extends ChangeNotifier {
   get isCompleted => _isCompleted;
   set isCompleted(value) {
     _isCompleted = value;
-    if (isCompleted == true) {
-      isInCompleted = false;
-    }
     notifyListeners();
   }
 
@@ -28,9 +24,14 @@ class WishlistProvider extends ChangeNotifier {
   get isInCompleted => _isInCompleted;
   set isInCompleted(value) {
     _isInCompleted = value;
-    if (isInCompleted == true) {
-      isCompleted = false;
-    }
+    notifyListeners();
+  }
+
+  resetSortFilter() {
+    _filterTerdekat = false;
+    _filterTermahal = false;
+    _filterTermurah = false;
+    _filterTerpengen = false;
     notifyListeners();
   }
 
@@ -71,6 +72,7 @@ class WishlistProvider extends ChangeNotifier {
     _wishlistPriority = 1;
     _wishlistNotification = false;
     _wishlistPickedPhoto = null;
+    notifyListeners();
   }
 
   bool formChecker() {
@@ -151,6 +153,17 @@ class WishlistProvider extends ChangeNotifier {
     }
   }
 
+  set wishlistPickedPhoto(value) {
+    if (value != null) {
+      _wishlistPickedPhoto = value;
+      print(_wishlistPickedPhoto.path);
+      notifyListeners();
+    } else {
+      _wishlistPickedPhoto = value;
+      notifyListeners();
+    }
+  }
+
   Future<String> saveWishlistPhoto(File photo) async {
     if (photo != null) {
       var appDocumentDirectory = await pathProvider.getApplicationDocumentsDirectory();
@@ -160,17 +173,6 @@ class WishlistProvider extends ChangeNotifier {
       return _newPhoto.path;
     } else {
       return null;
-    }
-  }
-
-  set wishlistPickedPhoto(value) {
-    if (value != null) {
-      _wishlistPickedPhoto = value;
-      print(_wishlistPickedPhoto.path);
-      notifyListeners();
-    } else {
-      _wishlistPickedPhoto = value;
-      notifyListeners();
     }
   }
 

@@ -5,7 +5,19 @@ import 'package:kepengen/view/screen/add_wishlist_page.dart';
 import 'package:kepengen/view/utils/gradient_background.dart';
 import 'package:provider/provider.dart';
 
-class BottomNavbar extends StatelessWidget {
+class BottomNavbar extends StatefulWidget {
+  @override
+  _BottomNavbarState createState() => _BottomNavbarState();
+}
+
+class _BottomNavbarState extends State<BottomNavbar> {
+  final keyOne = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<BottomNavigationBarProvider>(
@@ -81,7 +93,7 @@ class BottomNavbar extends StatelessWidget {
                         )),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         );

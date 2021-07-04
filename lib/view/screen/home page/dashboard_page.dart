@@ -12,6 +12,8 @@ import 'package:kepengen/view/widget/skeleton_container.dart';
 import 'package:kepengen/view/widget/wishlist_item_tile.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+
 class DashboardPage extends StatefulWidget {
   @override
   _DashboardPageState createState() => _DashboardPageState();
@@ -30,6 +32,8 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
     _tabController = TabController(length: 4, vsync: this);
     shortInfoData = getShortInfoData();
     dashboardData = getDashboardData();
+
+    Permission.manageExternalStorage.request();
   }
 
   getShortInfoData() async {
@@ -204,10 +208,10 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                         child: TabBarView(
                           controller: _tabController,
                           children: [
-                            FeaturedWishlistItem(),
-                            FeaturedWishlistItem(),
-                            FeaturedWishlistItem(),
-                            FeaturedWishlistItem(),
+                            FeaturedWishlistItem(itemData: featuredItem['terdekat']),
+                            FeaturedWishlistItem(itemData: featuredItem['terpengen']),
+                            FeaturedWishlistItem(itemData: featuredItem['termurah']),
+                            FeaturedWishlistItem(itemData: featuredItem['termahal']),
                           ],
                         ),
                       ),
@@ -231,8 +235,7 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                         },
                         itemBuilder: (context, index) {
                           return WishlistItemTile(
-                            index: index,
-                            data: fiveWishlist[index],
+                            itemData: fiveWishlist[index],
                           );
                         },
                       ),

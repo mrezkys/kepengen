@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         initialRoute: '/',
         routes: {
-          '/': (context) => HomePage(), //Homepage
+          '/': (context) => HomePage(),
           '/notification': (context) => NotificationPage(),
           '/profile': (context) => ProfilePage(),
         },

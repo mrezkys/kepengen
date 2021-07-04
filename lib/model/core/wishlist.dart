@@ -1,5 +1,3 @@
-import 'package:path/path.dart';
-
 class Wishlist {
   int id;
   String name;
