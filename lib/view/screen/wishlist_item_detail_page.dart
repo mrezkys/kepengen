@@ -45,56 +45,23 @@ class WishlistItemDetailPage extends StatelessWidget {
       }
     }
 
-    Future<dynamic> saveScreenshot() async {
-      String fileName = "Wishlist ${DateTime.now().millisecondsSinceEpoch.toString()}";
-      Directory directory;
-      try {
-        // Checking the permission
-        if (await _requestPermission(Permission.manageExternalStorage)) {
-          try {
-            // Process to get the directory path /Pictures/Kepengen
-            directory = await getExternalStorageDirectory();
-            String newPath = "";
-            List<String> folders = directory.path.split("/");
-            for (int i = 1; i < folders.length; i++) {
-              String folder = folders[i];
-              if (folder != 'Android') {
-                newPath += "/" + folder;
-              } else {
-                break;
-              }
-            }
-            print(newPath);
-            newPath = newPath + '/Pictures/Kepengen';
-            directory = Directory(newPath);
-          } catch (e) {
-            print(e);
-          }
-        } else {
-          return 'Mohon izinkan Akses Penyimpanan';
-        }
-
-        // Checking the directory | is exist or not, if not then create
-        if (!await directory.exists()) {
-          print(await Permission.storage.isGranted); // print Granted status
-          await directory.create(recursive: true);
-        }
-
-        // if exist you can save the screenshot
-        if (await directory.exists()) {
-          var file = await screenshotController.captureFromWidget(wishlistItemDetailScreenshot(itemData: itemData, context: context, countdownTimerController: _countdownTimerController));
-          var result = await ImageGallerySaver.saveImage(
-            file,
-            quality: 100,
-            name: 'Kepengen' + "/$fileName",
-          );
-          print(result);
-        }
-      } catch (e) {
-        print(e);
-        return e;
+    takeAndSaveScreenshot() async {
+      if (await _requestPermission(Permission.storage)) {
+        String fileName = "Wishlist ${DateTime.now().millisecondsSinceEpoch.toString()}";
+        var file = await screenshotController.captureFromWidget(wishlistItemDetailScreenshot(itemData: itemData, context: context, countdownTimerController: _countdownTimerController));
+        var result = await ImageGallerySaver.saveImage(
+          file,
+          quality: 100,
+          name: 'Kepengen' + "/$fileName",
+        );
+        print(result);
+        final imagePath = result['filePath'].toString().replaceAll(RegExp('file://'), '').replaceAll(RegExp('%20'), '  ,  ');
+        print(imagePath);
+        return imagePath;
+      } else {
+        print('not granted');
+        return 'error';
       }
-      return '${directory.path}/$fileName.jpg';
     }
 
     Future<void> shareImage(String path, Map imageData) {
@@ -138,7 +105,7 @@ class WishlistItemDetailPage extends StatelessWidget {
                         });
                     var value = await returnValue;
                     if (value == 'screenshot') {
-                      var screenshot = await saveScreenshot();
+                      var screenshot = await takeAndSaveScreenshot();
                       print(screenshot);
                       return showDialog(
                           context: context,
