@@ -12,8 +12,6 @@ import 'package:kepengen/view/widget/skeleton_container.dart';
 import 'package:kepengen/view/widget/wishlist_item_tile.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import 'package:permission_handler/permission_handler.dart';
-
 class DashboardPage extends StatefulWidget {
   @override
   _DashboardPageState createState() => _DashboardPageState();
@@ -32,8 +30,6 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
     _tabController = TabController(length: 4, vsync: this);
     shortInfoData = getShortInfoData();
     dashboardData = getDashboardData();
-
-    Permission.manageExternalStorage.request();
   }
 
   getShortInfoData() async {
