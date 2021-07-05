@@ -73,7 +73,13 @@ class WishlistItemDetailPageMenuModal extends StatelessWidget {
                     height: 3,
                   ),
                   // Share -------------
-                  MenuModalItem(text: 'Share', icon: SvgPicture.asset('assets/icons/Upload.svg')),
+                  MenuModalItem(
+                    text: 'Share',
+                    icon: SvgPicture.asset('assets/icons/Upload.svg'),
+                    onTap: () {
+                      Navigator.of(context).pop('share');
+                    },
+                  ),
                   Divider(
                     color: Colors.grey,
                     height: 3,
@@ -88,10 +94,8 @@ class WishlistItemDetailPageMenuModal extends StatelessWidget {
                   MenuModalItem(
                     text: 'Delete',
                     icon: SvgPicture.asset('assets/icons/Delete.svg'),
-                    onTap: () async {
-                      await DBProvider.db.deleteWishlist(wishlistId);
-                      Navigator.pop(context); //close the menu
-                      Navigator.pop(context); //close the wishlist item detail page
+                    onTap: () {
+                      Navigator.of(context).pop('delete');
                     },
                   ),
                   Divider(

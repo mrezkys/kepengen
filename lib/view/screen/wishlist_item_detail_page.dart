@@ -46,8 +46,31 @@ class WishlistItemDetailPage extends StatelessWidget {
     }
 
     takeAndSaveScreenshot() async {
+      String fileName = "Wishlist ${DateTime.now().millisecondsSinceEpoch.toString()}";
+      Directory directory;
       if (await _requestPermission(Permission.storage)) {
-        String fileName = "Wishlist ${DateTime.now().millisecondsSinceEpoch.toString()}";
+        // Process to get the directory path /Pictures/Kepengen
+        directory = await getExternalStorageDirectory();
+        String newPath = "";
+        List<String> folders = directory.path.split("/");
+        for (int i = 1; i < folders.length; i++) {
+          String folder = folders[i];
+          if (folder != 'Android') {
+            newPath += "/" + folder;
+          } else {
+            break;
+          }
+        }
+        print(newPath);
+        newPath = newPath + '/Pictures/Kepengen';
+        directory = Directory(newPath);
+
+        // Checking the directory | is exist or not, if not then create
+        if (!await directory.exists()) {
+          print(await Permission.storage.isGranted); // print Granted status
+          await directory.create(recursive: true);
+        }
+
         var file = await screenshotController.captureFromWidget(wishlistItemDetailScreenshot(itemData: itemData, context: context, countdownTimerController: _countdownTimerController));
         var result = await ImageGallerySaver.saveImage(
           file,
@@ -55,7 +78,7 @@ class WishlistItemDetailPage extends StatelessWidget {
           name: 'Kepengen' + "/$fileName",
         );
         print(result);
-        final imagePath = result['filePath'].toString().replaceAll(RegExp('file://'), '').replaceAll(RegExp('%20'), '  ,  ');
+        final imagePath = result['filePath'].toString().replaceAll(RegExp('file://'), '').replaceAll(RegExp('%20'), ' ');
         print(imagePath);
         return imagePath;
       } else {
@@ -64,12 +87,73 @@ class WishlistItemDetailPage extends StatelessWidget {
       }
     }
 
-    Future<void> shareImage(String path, Map imageData) {
-      Share.shareFiles(
-        [path],
-        text: 'Lihat nih wishlist saya ${imageData['name']}, seharga ${imageData['price']} di ${imageData['link']}. Kamu bisa simpan Wishlist dengan Aplikasi Kepengen, download di playstore : ',
-        subject: 'Lihat nih Wishlist saya,  ${imageData['name']}',
+    shareImage(String path, Wishlist itemData) {
+      try {
+        Share.shareFiles(
+          [path],
+          text: 'Lihat nih wishlist saya ${itemData.name}, seharga ${itemData.price} di ${itemData.link}. Kamu bisa simpan Wishlist dengan Aplikasi Kepengen, download di playstore : ',
+          subject: 'Lihat nih Wishlist saya,  ${itemData.name}',
+        );
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    screenshotAction({dynamic screenshotPath, Wishlist itemData}) {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            insetPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            content: Container(
+              width: MediaQuery.of(context).size.width * 80 / 100,
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Container(
+                    alignment: Alignment.topCenter,
+                    width: MediaQuery.of(context).size.width * 80 / 10,
+                    height: 240,
+                    color: Colors.black,
+                    child: Image.file(
+                      File(screenshotPath),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      print('share!');
+                      shareImage(screenshotPath, itemData);
+                    },
+                    child: Text('Bagikan Screenshot'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Lain Kali', style: TextStyle(color: Theme.of(context).primaryColor)),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      elevation: 0.0,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        },
       );
+    }
+
+    shareAction({@required Wishlist itemData}) {
+      shareImage(itemData.photo, itemData);
     }
 
     return Scaffold(
@@ -104,62 +188,19 @@ class WishlistItemDetailPage extends StatelessWidget {
                           );
                         });
                     var value = await returnValue;
+                    print(value);
                     if (value == 'screenshot') {
-                      var screenshot = await takeAndSaveScreenshot();
-                      print(screenshot);
-                      return showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              insetPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                              content: Container(
-                                width: MediaQuery.of(context).size.width * 80 / 100,
-                                child: ListView(
-                                  shrinkWrap: true,
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.topCenter,
-                                      width: MediaQuery.of(context).size.width * 80 / 10,
-                                      height: 240,
-                                      color: Colors.black,
-                                      child: Image.file(
-                                        File(screenshot),
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        print('share!');
-                                        shareImage(screenshot, {
-                                          'name': itemData.name,
-                                          'price': itemData.price,
-                                          'link': itemData.link,
-                                        });
-                                      },
-                                      child: Text('Bagikan Screenshot'),
-                                      style: ElevatedButton.styleFrom(
-                                        padding: EdgeInsets.symmetric(vertical: 15),
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Lain Kali', style: TextStyle(color: Theme.of(context).primaryColor)),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Colors.white,
-                                        padding: EdgeInsets.symmetric(vertical: 15),
-                                        elevation: 0.0,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          });
+                      var screenshotPath = await takeAndSaveScreenshot();
+                      return screenshotAction(screenshotPath: screenshotPath, itemData: itemData);
+                    }
+
+                    if (value == 'share') {
+                      return shareAction(itemData: itemData);
+                    }
+
+                    if (value == 'delete') {
+                      await DBProvider.db.deleteWishlist(itemData.id);
+                      Navigator.of(context).pop();
                     }
                   },
                 ),
