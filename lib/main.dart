@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kepengen/model/helper/dummy_helper.dart';
-import 'package:kepengen/provider/bottom_navigation_bar_provider.dart';
+import 'package:kepengen/provider/app_state_provider.dart';
 import 'package:kepengen/provider/wishlist_provider.dart';
 import 'package:kepengen/view/screen/home_page.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     FlutterStatusbarcolor.setStatusBarColor(Color(0xFF3195F0));
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => BottomNavigationBarProvider()),
+        ChangeNotifierProvider(create: (_) => AppStateProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
       ],
       child: MaterialApp(

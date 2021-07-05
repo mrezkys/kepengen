@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kepengen/provider/bottom_navigation_bar_provider.dart';
+import 'package:kepengen/provider/app_state_provider.dart';
 import 'package:kepengen/view/screen/add_wishlist_page.dart';
 import 'package:kepengen/view/utils/gradient_background.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +20,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<BottomNavigationBarProvider>(
+    return Consumer<AppStateProvider>(
       builder: (context, bottomNavigationBar, child) {
         return Container(
           height: 100,
