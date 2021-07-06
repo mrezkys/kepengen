@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kepengen/provider/local_database.dart';
 import 'package:kepengen/provider/wishlist_provider.dart';
 import 'package:kepengen/view/modal/wishlist_page_filter_modal.dart';
-import 'package:kepengen/view/screen/wishlist_item_detail_page.dart';
 import 'package:kepengen/view/utils/gradient_background.dart';
 import 'package:kepengen/view/widget/main_app_bar.dart';
 import 'package:kepengen/view/widget/skeleton_container.dart';
