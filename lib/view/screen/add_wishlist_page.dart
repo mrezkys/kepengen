@@ -58,7 +58,8 @@ class _AddWishlistPageState extends State<AddWishlistPage> {
                   priority: provider.wishlistPriority,
                 )));
                 provider.formReset();
-                Navigator.of(context).pop();
+                // TODO: change to push replacement because it still can be backed to before state
+                Navigator.of(context).popAndPushNamed('/');
               } else {
                 print('ulangi');
               }
