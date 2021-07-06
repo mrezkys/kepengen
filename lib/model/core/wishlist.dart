@@ -39,7 +39,6 @@ class Wishlist {
 
   @override
   String toString() {
-    // TODO: implement toString
     return 'Wishlist(id : $id, name : $name, link : $link, deadline : $deadline, notification : $notification, photo : $photo, price : $price, priority : $priority, status : $status';
   }
 }
