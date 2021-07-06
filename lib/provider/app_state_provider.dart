@@ -9,9 +9,4 @@ class AppStateProvider with ChangeNotifier {
     _currentIndex = index;
     notifyListeners();
   }
-
-  refreshState() {
-    notifyListeners();
-    return true;
-  }
 }
