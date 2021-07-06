@@ -141,7 +141,6 @@ Widget wishlistItemDetailScreenshot({Wishlist itemData, BuildContext context, Co
                                             flex: 4,
                                             child: Center(
                                               child: IconButton(
-                                                // TODO: make notification if this clicked but the link is null
                                                 icon: SvgPicture.asset('assets/icons/Send.svg'),
                                                 onPressed: () {},
                                               ),
