@@ -22,7 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:share/share.dart';
 
 class WishlistItemDetailPage extends StatelessWidget {
-  Wishlist itemData;
+  final Wishlist itemData;
   WishlistItemDetailPage({@required this.itemData});
 
   @override
