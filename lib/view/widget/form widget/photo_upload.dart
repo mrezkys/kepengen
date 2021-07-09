@@ -73,7 +73,7 @@ class PhotoUpload extends StatelessWidget {
                       children: <Widget>[
                         Row(
                           children: [
-                            SvgPicture.asset('assets/icons/Folder.svg', color: (provider.wishlistPickedPhoto != null) ? Colors.black : Colors.white), //TODO: update pubspec : add document icon
+                            SvgPicture.asset('assets/icons/Document.svg', color: (provider.wishlistPickedPhoto != null) ? Colors.black : Colors.white), //TODO: update pubspec : add document icon
                             SizedBox(width: 15),
                             Text('Dummy', style: TextStyle(fontSize: 12, color: (provider.wishlistPickedPhoto != null) ? Color(0xFF606772) : Colors.white)),
                           ],

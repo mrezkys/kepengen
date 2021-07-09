@@ -171,7 +171,7 @@ class WishlistItemDetailPage extends StatelessWidget {
                   textColor: Colors.white,
                   title: 'Notification',
                   leftIconPath: 'assets/icons/Arrow-left.svg',
-                  rightIconPath: 'assets/icons/Info Square.svg',
+                  rightIconPath: 'assets/icons/More Square.svg',
                   leftIconOnPressed: () {
                     Navigator.pop(context);
                   },
