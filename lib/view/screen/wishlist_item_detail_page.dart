@@ -222,7 +222,7 @@ class WishlistItemDetailPage extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            (itemData.status == 0) ? 'InCompleted' : 'Completed',
+                            (itemData.status == 0) ? 'Belum Selesai' : 'Selesai',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.white,

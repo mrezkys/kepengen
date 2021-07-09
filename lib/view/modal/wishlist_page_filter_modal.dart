@@ -91,7 +91,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            'Completed',
+                            'Selesai',
                             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                           Checkbox(
@@ -118,7 +118,7 @@ class _WishlistPageFilterModalState extends State<WishlistPageFilterModal> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            'InCompleted',
+                            'Belum Selesai',
                             style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14, fontFamily: 'Poppins'),
                           ),
                           Checkbox(
