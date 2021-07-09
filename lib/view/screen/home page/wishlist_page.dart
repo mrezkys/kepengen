@@ -28,6 +28,12 @@ class _WishlistPageState extends State<WishlistPage> {
     return _listWishlist;
   }
 
+  refreshParentPage() {
+    setState(() {
+      listWishlist = getListWishlist();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -184,6 +190,7 @@ class _WishlistPageState extends State<WishlistPage> {
                           itemBuilder: (context, index) {
                             return WishlistItemTile(
                               itemData: data.data[index],
+                              onUpdated: refreshParentPage,
                             );
                           },
                         );

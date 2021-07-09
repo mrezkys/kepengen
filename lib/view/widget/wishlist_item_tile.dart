@@ -4,8 +4,9 @@ import 'package:kepengen/model/core/wishlist.dart';
 import 'package:kepengen/view/screen/wishlist_item_detail_page.dart';
 
 class WishlistItemTile extends StatelessWidget {
+  Function onUpdated;
   Wishlist itemData;
-  WishlistItemTile({@required this.itemData});
+  WishlistItemTile({@required this.itemData, @required this.onUpdated});
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +16,7 @@ class WishlistItemTile extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => WishlistItemDetailPage(
               itemData: itemData,
+              onCompleted: onUpdated,
             ),
           ),
         );

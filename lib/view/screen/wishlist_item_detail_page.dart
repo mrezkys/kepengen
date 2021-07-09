@@ -23,7 +23,8 @@ import 'package:share/share.dart';
 
 class WishlistItemDetailPage extends StatelessWidget {
   final Wishlist itemData;
-  WishlistItemDetailPage({@required this.itemData});
+  final Function onCompleted;
+  WishlistItemDetailPage({@required this.itemData, @required this.onCompleted});
 
   @override
   Widget build(BuildContext context) {
@@ -391,6 +392,8 @@ class WishlistItemDetailPage extends StatelessWidget {
                     onPressed: () {
                       print('clicked');
                       DBProvider.db.setCompletedWishlist(itemData.id).then((value) => print(value));
+                      Navigator.of(context).pop();
+                      onCompleted();
                     },
                     style: ElevatedButton.styleFrom(
                       primary: (itemData.status == 0) ? Color(0xFF15DBAB) : Color(0xFFDCB30B),
