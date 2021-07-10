@@ -28,7 +28,6 @@ class WishlistItemDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: buat kaya notifikasi kalau sudah completed
     CountdownTimerController _countdownTimerController = CountdownTimerController(endTime: DateTime.parse(itemData.deadline).millisecondsSinceEpoch);
 
     ScreenshotController screenshotController = ScreenshotController();
