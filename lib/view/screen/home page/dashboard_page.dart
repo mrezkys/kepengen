@@ -142,12 +142,12 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
           FutureBuilder(
             future: dashboardData,
             builder: (context, data) {
-              print(data.connectionState);
+              // print(data.connectionState);
               if (data.connectionState == ConnectionState.done) {
                 var featuredItem = data.data['featured_items'];
                 var fiveWishlist = data.data['five_wishlist'];
-                print(featuredItem);
-                print(fiveWishlist);
+                // print(featuredItem);
+                // print(fiveWishlist);
                 if (!ValueChecker.isNullOrEmpty(featuredItem['terdekat']) && fiveWishlist.isNotEmpty) {
                   return ListView(
                     shrinkWrap: true,

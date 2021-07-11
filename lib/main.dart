@@ -36,11 +36,11 @@ alarmScheduler(datetime, itemName, itemId) async {
   var scheduleNotificationDatetime = DateTime.parse(datetime);
   var androidPlatformChannelSpecifics = AndroidNotificationDetails('alarm_notif', 'alarm_notif', 'Channel for alarm notification', largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'));
   var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-  await flutterLocalNotificationsPlugin.schedule(itemId, 'title : ' + itemName, 'ini detik ke ', scheduleNotificationDatetime, platformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.schedule(itemId, 'Pengingat Wishlist', 'Hari ini waktunya kamu beli ' + itemName, scheduleNotificationDatetime, platformChannelSpecifics);
 }
 
 wishslistAlarm() async {
-  List<Wishlist> wishlist = await DBProvider.db.getAllWishlist();
+  List<Wishlist> wishlist = await DBProvider.db.getNotificationWishlist();
   print(wishlist.length);
   for (var i = 0; i < wishlist.length; i++) {
     print(i);
