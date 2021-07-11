@@ -9,7 +9,8 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class FeaturedWishlistItem extends StatelessWidget {
   final Wishlist itemData;
-  FeaturedWishlistItem({@required this.itemData});
+  Function onUpdated;
+  FeaturedWishlistItem({@required this.itemData, this.onUpdated});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -18,6 +19,7 @@ class FeaturedWishlistItem extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => WishlistItemDetailPage(
               itemData: itemData,
+              refreshParent: onUpdated,
             ),
           ),
         );

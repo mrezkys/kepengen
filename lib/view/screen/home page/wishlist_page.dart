@@ -190,7 +190,7 @@ class _WishlistPageState extends State<WishlistPage> {
                           itemBuilder: (context, index) {
                             return WishlistItemTile(
                               itemData: data.data[index],
-                              onUpdated: refreshParentPage,
+                              refreshParent: refreshParentPage,
                             );
                           },
                         );

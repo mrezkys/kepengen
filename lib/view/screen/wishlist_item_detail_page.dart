@@ -23,8 +23,8 @@ import 'package:share/share.dart';
 
 class WishlistItemDetailPage extends StatelessWidget {
   final Wishlist itemData;
-  final Function onCompleted;
-  WishlistItemDetailPage({@required this.itemData, @required this.onCompleted});
+  final Function refreshParent;
+  WishlistItemDetailPage({@required this.itemData, @required this.refreshParent});
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +201,7 @@ class WishlistItemDetailPage extends StatelessWidget {
                     if (value == 'delete') {
                       await DBProvider.db.deleteWishlist(itemData.id);
                       Navigator.of(context).pop();
+                      refreshParent();
                     }
                   },
                 ),
@@ -392,7 +393,7 @@ class WishlistItemDetailPage extends StatelessWidget {
                       print('clicked');
                       DBProvider.db.setCompletedWishlist(itemData.id).then((value) => print(value));
                       Navigator.of(context).pop();
-                      onCompleted();
+                      refreshParent();
                     },
                     style: ElevatedButton.styleFrom(
                       primary: (itemData.status == 0) ? Color(0xFF15DBAB) : Color(0xFFDCB30B),

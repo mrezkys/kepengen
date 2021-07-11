@@ -66,6 +66,13 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
     };
   }
 
+  refreshParentPage() {
+    setState(() {
+      shortInfoData = getShortInfoData();
+      dashboardData = getDashboardData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -232,6 +239,7 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                         itemBuilder: (context, index) {
                           return WishlistItemTile(
                             itemData: fiveWishlist[index],
+                            refreshParent: refreshParentPage,
                           );
                         },
                       ),
