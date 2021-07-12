@@ -26,43 +26,51 @@ class MainAppBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Material(
-            color: Colors.transparent,
-            shape: CircleBorder(),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(100),
-              splashColor: Colors.black.withOpacity(0.03),
-              highlightColor: Colors.black.withOpacity(0.03),
-              focusColor: Colors.black.withOpacity(0.03),
-              onTap: leftIconOnPressed,
-              child: IconButton(
-                onPressed: null,
-                icon: SvgPicture.asset(
-                  leftIconPath,
-                  color: iconColor,
+          (leftIconPath is String && leftIconOnPressed is Function)
+              ? Material(
+                  color: Colors.transparent,
+                  shape: CircleBorder(),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(100),
+                    splashColor: Colors.black.withOpacity(0.03),
+                    highlightColor: Colors.black.withOpacity(0.03),
+                    focusColor: Colors.black.withOpacity(0.03),
+                    onTap: leftIconOnPressed,
+                    child: IconButton(
+                      onPressed: null,
+                      icon: SvgPicture.asset(
+                        leftIconPath,
+                        color: iconColor,
+                      ),
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  width: 42,
                 ),
-              ),
-            ),
-          ),
           Text(title, style: TextStyle(fontFamily: 'Open Sans', color: textColor, fontSize: 14, fontWeight: FontWeight.w500, decoration: TextDecoration.none)),
-          Material(
-            color: Colors.transparent,
-            shape: CircleBorder(),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(100),
-              splashColor: Colors.black.withOpacity(0.03),
-              highlightColor: Colors.black.withOpacity(0.03),
-              focusColor: Colors.black.withOpacity(0.03),
-              onTap: rightIconOnPressed,
-              child: IconButton(
-                onPressed: null,
-                icon: SvgPicture.asset(
-                  rightIconPath,
-                  color: iconColor,
+          (rightIconPath is String && leftIconOnPressed is Function)
+              ? Material(
+                  color: Colors.transparent,
+                  shape: CircleBorder(),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(100),
+                    splashColor: Colors.black.withOpacity(0.03),
+                    highlightColor: Colors.black.withOpacity(0.03),
+                    focusColor: Colors.black.withOpacity(0.03),
+                    onTap: rightIconOnPressed,
+                    child: IconButton(
+                      onPressed: null,
+                      icon: SvgPicture.asset(
+                        rightIconPath,
+                        color: iconColor,
+                      ),
+                    ),
+                  ),
+                )
+              : SizedBox(
+                  width: 42,
                 ),
-              ),
-            ),
-          ),
         ],
       ),
     );
