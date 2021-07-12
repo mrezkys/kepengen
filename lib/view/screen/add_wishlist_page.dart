@@ -79,14 +79,25 @@ class _AddWishlistPageState extends State<AddWishlistPage> {
               background: Colors.white,
               iconColor: Colors.black,
               textColor: Colors.black,
-              title: 'Add Wishlist',
+              title: 'Tambah Wishlist',
               leftIconPath: 'assets/icons/Arrow-left.svg',
               rightIconPath: 'assets/icons/Info Square.svg',
               leftIconOnPressed: () {
                 provider.formReset();
                 Navigator.of(context).pop();
               },
-              rightIconOnPressed: () {},
+              rightIconOnPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    content: Text(
+                      'Kamu bisa menambahkan wishlist dengan mengisi data tentang barang yang kamu inginkan. Tersedia juga opsi pengingat yang akan memberikan notifikasi apabila sudah waktunya.',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                );
+              },
             ),
             Container(
               width: MediaQuery.of(context).size.width,
