@@ -205,7 +205,7 @@ class DBProvider {
 
     else if (filter == 'all') {
       final db = await database;
-      var res = await db.query("wishlist");
+      var res = await db.rawQuery("SELECT * FROM WISHLIST ORDER BY id DESC");
       try {
         return res.map((e) => Wishlist.fromJson(e)).toList();
       } catch (e) {
