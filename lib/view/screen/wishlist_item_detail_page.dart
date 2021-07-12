@@ -91,7 +91,8 @@ class WishlistItemDetailPage extends StatelessWidget {
       try {
         Share.shareFiles(
           [path],
-          text: 'Lihat nih wishlist saya ${itemData.name}, seharga ${itemData.price} di ${itemData.link}. Kamu bisa simpan Wishlist dengan Aplikasi Kepengen, download di playstore : ',
+          text:
+              'Lihat nih wishlist saya ${itemData.name}, seharga ${RupiahFormatter.formatCurrency.format(itemData.price)} di ${itemData.link}. Kamu bisa simpan Wishlist dengan Aplikasi Kepengen, download di playstore : ',
           subject: 'Lihat nih Wishlist saya,  ${itemData.name}',
         );
       } catch (e) {
