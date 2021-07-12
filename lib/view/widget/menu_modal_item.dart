@@ -11,6 +11,7 @@ class MenuModalItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        color: Colors.white,
         width: MediaQuery.of(context).size.width - 20 - 20,
         height: 45,
         alignment: Alignment.center,
