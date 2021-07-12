@@ -211,10 +211,22 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                         child: TabBarView(
                           controller: _tabController,
                           children: [
-                            FeaturedWishlistItem(itemData: featuredItem['terdekat']),
-                            FeaturedWishlistItem(itemData: featuredItem['terpengen']),
-                            FeaturedWishlistItem(itemData: featuredItem['termurah']),
-                            FeaturedWishlistItem(itemData: featuredItem['termahal']),
+                            FeaturedWishlistItem(
+                              itemData: featuredItem['terdekat'],
+                              refreshParent: refreshParentPage,
+                            ),
+                            FeaturedWishlistItem(
+                              itemData: featuredItem['terpengen'],
+                              refreshParent: refreshParentPage,
+                            ),
+                            FeaturedWishlistItem(
+                              itemData: featuredItem['termurah'],
+                              refreshParent: refreshParentPage,
+                            ),
+                            FeaturedWishlistItem(
+                              itemData: featuredItem['termahal'],
+                              refreshParent: refreshParentPage,
+                            ),
                           ],
                         ),
                       ),
