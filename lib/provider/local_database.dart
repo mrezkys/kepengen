@@ -60,6 +60,17 @@ class DBProvider {
     }
   }
 
+  Future<List<Wishlist>> getOutdatedWishlist() async {
+    final db = await database;
+    var res = await db.rawQuery("SELECT * FROM wishlist WHERE deadline < datetime('now', 'localtime') ");
+    if (res.isEmpty) {
+      print('emty');
+      return [];
+    } else {
+      return res.map((e) => Wishlist.fromJson(e)).toList();
+    }
+  }
+
   Future<List<Wishlist>> getAllWishlist({String filter = 'all'}) async {
     if (filter == 'completed') {
       final db = await database;
